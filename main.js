@@ -36,7 +36,7 @@ var app = http.createServer(function(request,response){
         db.query('SELECT * FROM TOPIC', function(error, topics){ // 콜백함수의 형식(signature)
             var title = 'Welcome';
             var description = 'Hello, Node.js';
-            var list = template.list(topics); // topics가 콘솔에서 배열로 반환되므로, template.js에서 배열의 요소를 지정하도록 수정함
+            var list = template.list(topics); // topics가 콘솔에서 배열로 반환되므로, template.js에서 배열의 요소를 지정하도록 수정함(url은 id, 제목은 title에 대응)
             var html = template.HTML(title, list,
             `<h2>${title}</h2>${description}`,
             `<a href="/create">create</a>`
