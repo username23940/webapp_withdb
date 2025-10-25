@@ -38,11 +38,11 @@ var app = http.createServer(function(request,response){
             response.end(html); // 웹에는 이거 뜸
         })
       } else {
-          db.query('SELECT * FROM TOPIC', function(error, topics){ // 테이블에서 id 값 = url의 querystring 값
+          db.query('SELECT * FROM topic', function(error, topics){ // 테이블에서 id 값 = url의 querystring 값
             if(error) {
               throw error;
               }
-          db.query(`SELECT * FROM TOPIC WHERE id=${queryData.id}`, function(error2, topic){ // id=?`, [queryData.id] 로 쓰면 sql injection 방어 가능. 두번째 인자가 ?에 치환
+          db.query(`SELECT * FROM topic LEFT JOIN author on author.id=topic.author_id WHERE topic.id=${queryData.id}`, function(error2, topic){ // id=?`, [queryData.id] 로 쓰면 sql injection 방어 가능. 두번째 인자가 ?에 치환
             if(error2) {
               throw error2; // 오류가 있다면 알리고 즉시 중지
               }
@@ -50,7 +50,7 @@ var app = http.createServer(function(request,response){
             var description = topic[0].description;
             var list = template.list(topics);
             var html = template.HTML(title, list,
-              `<h2>${title}</h2>${description}`,
+              `<h2>${title}</h2>${description}<p>by ${topic[0].name}</p>`, // JOIN 활용!
               ` <a href="/create">create</a>
                 <a href="/update?id=${queryData.id}">update</a>
                 <form action="delete_process" method="post">
@@ -66,6 +66,10 @@ var app = http.createServer(function(request,response){
         if(error) {
             throw error;
         }
+     db.query('SELECT * FROM author', function(error2, authors){ // 저자 선택 기능 추가
+         if(error2) {
+             throw error2;
+         }
         var title = 'Create';
         var list = template.list(topics);  
         var html = template.HTML(title, list, `
@@ -74,12 +78,15 @@ var app = http.createServer(function(request,response){
         <p>
           <textarea name="description" placeholder="description"></textarea>
         </p>
+         <select name='author'> // 콤보 박스 생성. name 속성은 서버로 제출되는 값.
+          ${template.authorSelect(authors)}
+         </select>
         <p>
           <input type="submit">
         </p>
       </form>`, ''); // submit 누르면 /create_process로 전달        
         response.writeHead(200);
-        response.end(html); 
+        response.end(html);
      });
     } else if(pathname === '/create_process'){
       var body = '';
