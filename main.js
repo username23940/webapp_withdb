@@ -7,7 +7,7 @@ var path = require('path');
 var sanitizeHtml = require('sanitize-html');
 var mysql = require('mysql');
 
-var db = mysql.createConnection({ // sql 서버와 연결, 계속 조작해야하므로 객체를 변수에 대입
+var db = mysql.createConnection({ // sql 서버와 연결 생성, 계속 조작해야하므로 객체를 변수에 대입
     host:'localhost',
     user:'root',
     password:'1111',
@@ -33,18 +33,18 @@ var app = http.createServer(function(request,response){
           response.writeHead(200);
           response.end(html);
         }); */
-        db.query('SELECT * FROM TOPIC', function(error, topics){ // 콜백함수의 형식(signature)
+        db.query('SELECT * FROM topic', function(error, topics){ // 콜백함수의 형식(signature). sql의 결과가 topics에 담김
             if(error) {
                 throw error;
             }
             var title = 'Welcome';
             var description = 'Hello, Node.js';
-            var list = template.list(topics); // topics가 콘솔에서 배열로 반환되므로, template.js에서 배열의 요소를 지정하도록 수정함(url은 id, 제목은 title에 대응)
+            var list = template.list(topics); // 콘솔에서 보면 topics가  배열로 반환되므로, template.js에서 배열의 요소를 지정하도록 수정함(url은 id column, 제목은 title에 대응)
             var html = template.HTML(title, list,
             `<h2>${title}</h2>${description}`,
             `<a href="/create">create</a>`
             
-            console.log(topics); // nodejs 콘솔에는 sql 서버의 opentutorials db의 topics table이 뜸
+            console.log(topics); // nodejs 콘솔에는 sql 서버의 opentutorials db의 topics table이 뜸. 배열에 여러 객체가 요소로 반환됨!!!!!!!!!!!
             response.writeHead(200);
             response.end(html); // 웹에는 이거 뜸
         })
@@ -77,7 +77,7 @@ var app = http.createServer(function(request,response){
               }
           db.query(`SELECT * FROM TOPIC WHERE id=${queryData.id}`, function(error2, topic){ // id=?`, [queryData.id] 로 쓰면 sql injection 방어 가능. 두번째 인자가 ?에 치환
             if(error2) {
-              throw error2;
+              throw error2; // 오류가 있다면 알리고 즉시 중지
               }
             var title = topic[0].title; // topic 들고 올 때 배열로 들고옴(단 하나의 요소가 객체. topics와 달리 WHERE로 하나만 선택했으니까)
             var description = topic[0].description;
