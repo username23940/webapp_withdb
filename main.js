@@ -22,17 +22,6 @@ var app = http.createServer(function(request,response){
     
     if(pathname === '/'){
       if(queryData.id === undefined){
-        /* fs.readdir('./data', function(error, filelist){
-          var title = 'Welcome';
-          var description = 'Hello, Node.js';
-          var list = template.list(filelist);
-          var html = template.HTML(title, list,
-            `<h2>${title}</h2>${description}`,
-            `<a href="/create">create</a>`
-          );
-          response.writeHead(200);
-          response.end(html);
-        }); */
         db.query('SELECT * FROM topic', function(error, topics){ // 콜백함수의 형식(signature). sql의 결과가 topics에 담김
             if(error) {
                 throw error;
@@ -42,35 +31,13 @@ var app = http.createServer(function(request,response){
             var list = template.list(topics); // 콘솔에서 보면 topics가  배열로 반환되므로, template.js에서 배열의 요소를 지정하도록 수정함(url은 id column, 제목은 title에 대응)
             var html = template.HTML(title, list,
             `<h2>${title}</h2>${description}`,
-            `<a href="/create">create</a>`
+            `<a href="/create">create</a>`);
             
             console.log(topics); // nodejs 콘솔에는 sql 서버의 opentutorials db의 topics table이 뜸. 배열에 여러 객체가 요소로 반환됨!!!!!!!!!!!
             response.writeHead(200);
             response.end(html); // 웹에는 이거 뜸
         })
       } else {
-          /* fs.readdir('./data', function(error, filelist){
-          var filteredId = path.parse(queryData.id).base;
-          fs.readFile(`data/${filteredId}`, 'utf8', function(err, description){
-            var title = queryData.id;
-            var sanitizedTitle = sanitizeHtml(title);
-            var sanitizedDescription = sanitizeHtml(description, {
-              allowedTags:['h1']
-            });
-            var list = template.list(filelist);
-            var html = template.HTML(sanitizedTitle, list,
-              `<h2>${sanitizedTitle}</h2>${sanitizedDescription}`,
-              ` <a href="/create">create</a>
-                <a href="/update?id=${sanitizedTitle}">update</a>
-                <form action="delete_process" method="post">
-                  <input type="hidden" name="id" value="${sanitizedTitle}">
-                  <input type="submit" value="delete">
-                </form>`
-            );
-            response.writeHead(200);
-            response.end(html);
-          });
-        }); */
           db.query('SELECT * FROM TOPIC', function(error, topics){ // 테이블에서 id 값 = url의 querystring 값
             if(error) {
               throw error;
@@ -89,13 +56,13 @@ var app = http.createServer(function(request,response){
                 <form action="delete_process" method="post">
                   <input type="hidden" name="id" value="${queryData.id}">
                   <input type="submit" value="delete">
-                </form>`          
+                </form>`);
             response.writeHead(200);
             response.end(html); 
           });
         });
     } else if(pathname === '/create'){
-      fs.readdir('./data', function(error, filelist){
+      /*fs.readdir('./data', function(error, filelist){
         var title = 'WEB - create';
         var list = template.list(filelist);
         var html = template.HTML(title, list, `
@@ -111,20 +78,41 @@ var app = http.createServer(function(request,response){
         `, '');
         response.writeHead(200);
         response.end(html);
-      });
+      });*/
+         db.query('SELECT * FROM topic', function(error, topics){ // 콜백함수의 형식(signature). sql의 결과가 topics에 담김
+            if(error) {
+                throw error;
+            }
+            var title = 'Create';
+            var list = template.list(topics);  
+            var html = template.HTML(title, list, `
+          <form action="/create_process" method="post">
+            <p><input type="text" name="title" placeholder="title"></p>
+            <p>
+              <textarea name="description" placeholder="description"></textarea>
+            </p>
+            <p>
+              <input type="submit">
+            </p>
+          </form>`, ''); // submit 누르면 /create_process로 전달
+            
+            response.writeHead(200);
+            response.end(html); 
+         });
     } else if(pathname === '/create_process'){
       var body = '';
       request.on('data', function(data){
           body = body + data;
       });
       request.on('end', function(){
-          var post = qs.parse(body);
-          var title = post.title;
-          var description = post.description;
-          fs.writeFile(`data/${title}`, description, 'utf8', function(err){
-            response.writeHead(302, {Location: `/?id=${title}`});
-            response.end();
-          })
+          var post = qs.parse(body)
+          db.query(`INSERT INTO topic (title, description, created, author_id VALUES(?,?, NOW(), ?)`, [post.title, post.description, 1], function(error, result){
+              if(error) {
+                  throw error;
+              }
+              response.writeHead(302, {Location: `/?id=${result.insertId}`}); // 방금 삽입한 행의 id 값 찾기
+              response.end(); 
+          });       
       });
     } else if(pathname === '/update'){
       fs.readdir('./data', function(error, filelist){
