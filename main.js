@@ -79,7 +79,7 @@ var app = http.createServer(function(request,response){
             if(error2) {
               throw error2;
               }
-            var title = topic[0].title; // topic 들고 올 때 배열로 들고옴(단 하나의 요소가 객체)
+            var title = topic[0].title; // topic 들고 올 때 배열로 들고옴(단 하나의 요소가 객체. topics와 달리 WHERE로 하나만 선택했으니까)
             var description = topic[0].description;
             var list = template.list(topics);
             var html = template.HTML(title, list,
