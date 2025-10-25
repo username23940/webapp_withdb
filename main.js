@@ -5,14 +5,24 @@ var qs = require('querystring');
 var template = require('./lib/template.js');
 var path = require('path');
 var sanitizeHtml = require('sanitize-html');
+var mysql = require('mysql');
+
+var db = mysql.createConnection({ // sql 서버와 연결, 계속 조작해야하므로 객체를 변수에 대입
+    host:'localhost',
+    user:'root',
+    password:'1111',
+    database:'opentutorials'
+});
+db.connect(); // db 실제 접속
 
 var app = http.createServer(function(request,response){
     var _url = request.url;
     var queryData = url.parse(_url, true).query;
     var pathname = url.parse(_url, true).pathname;
+    
     if(pathname === '/'){
       if(queryData.id === undefined){
-        fs.readdir('./data', function(error, filelist){
+        /* fs.readdir('./data', function(error, filelist){
           var title = 'Welcome';
           var description = 'Hello, Node.js';
           var list = template.list(filelist);
@@ -22,9 +32,21 @@ var app = http.createServer(function(request,response){
           );
           response.writeHead(200);
           response.end(html);
-        });
+        }); */
+        db.query('SELECT * FROM TOPIC', function(error, topics){ // 콜백함수의 형식(signature)
+            var title = 'Welcome';
+            var description = 'Hello, Node.js';
+            var list = template.list(topics);
+            var html = template.HTML(title, list,
+            `<h2>${title}</h2>${description}`,
+            `<a href="/create">create</a>`
+            
+            console.log(topics); // nodejs 콘솔에는 sql 서버의 opentutorials db의 topics table이 뜸
+            response.writeHead(200);
+            response.end(html); // 웹에는 이거 뜸
+        })
       } else {
-        fs.readdir('./data', function(error, filelist){
+          /* fs.readdir('./data', function(error, filelist){
           var filteredId = path.parse(queryData.id).base;
           fs.readFile(`data/${filteredId}`, 'utf8', function(err, description){
             var title = queryData.id;
@@ -45,8 +67,30 @@ var app = http.createServer(function(request,response){
             response.writeHead(200);
             response.end(html);
           });
+        }); */
+          db.query('SELECT * FROM TOPIC', function(error, topics){ // 테이블에서 id 값 = url의 querystring 값
+            if(error) {
+              throw error;
+              }
+          db.query(`SELECT * FROM TOPIC WHERE id=${queryData.id}`, function(error2, topic){ // id=?`, [queryData.id] 로 쓰면 sql injection 방어 가능. 두번째 인자가 ?에 치환
+            if(error2) {
+              throw error2;
+              }
+            var title = topic[0].title; // topic 들고 올 때 배열로 들고옴(단 하나의 요소가 객체)
+            var description = topic[0].description;
+            var list = template.list(topics);
+            var html = template.HTML(title, list,
+              `<h2>${title}</h2>${description}`,
+              ` <a href="/create">create</a>
+                <a href="/update?id=${queryData.id}">update</a>
+                <form action="delete_process" method="post">
+                  <input type="hidden" name="id" value="${queryData.id}">
+                  <input type="submit" value="delete">
+                </form>`          
+            response.writeHead(200);
+            response.end(html); 
+          });
         });
-      }
     } else if(pathname === '/create'){
       fs.readdir('./data', function(error, filelist){
         var title = 'WEB - create';
