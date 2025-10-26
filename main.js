@@ -31,7 +31,7 @@ var app = http.createServer(function(request,response){
        topic.update_process(request, response);
       } 
     else if(pathname === '/delete_process'){
-      topic.delete(request, response);
+      topic.delete_process(request, response);
       } 
     else {
       response.writeHead(404);
