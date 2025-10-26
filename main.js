@@ -1,19 +1,9 @@
 var http = require('http');
-var fs = require('fs');
 var url = require('url');
+var path = require('path');
 var qs = require('querystring');
 var template = require('./lib/template.js');
-var path = require('path');
-var sanitizeHtml = require('sanitize-html');
-var mysql = require('mysql');
-
-var db = mysql.createConnection({ // sql 서버와 연결 생성, 계속 조작해야하므로 객체를 변수에 대입
-    host:'localhost',
-    user:'root',
-    password:'1111',
-    database:'opentutorials'
-});
-db.connect(); // db 실제 접속
+var db = require('./lib/db.js');
 
 var app = http.createServer(function(request,response){
     var _url = request.url;
