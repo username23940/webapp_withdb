@@ -38,7 +38,7 @@ var app = http.createServer(function(request,response){ // 요청이 들어오�
     else if(pathname === '/author'){
       author.home(request, response);
       }
-    else if(pathname === '/create_author_process'){
+    else if(pathname === '/author/create_process'){
       author.create_process(request, response);
       }
     else {
