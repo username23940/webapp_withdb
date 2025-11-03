@@ -5,6 +5,8 @@ var qs = require('querystring');
 var template = require('./lib/template.js');
 var db = require('./lib/db.js'); // 확장자 생략 가능
 var topic = require('./lib/topic.js');
+var author = require('./lib/author.js');
+
 
 var app = http.createServer(function(request,response){ // 요청이 들어오면 req, res 객체를 생성해서 이 콜백에 전달. req는 요청 내용(주소, 헤더, 바디 등)을 담고 있고, res는 응답을 돌려주는 데 필요한 메서드(writeHead, end, 등)를 가짐.
     var _url = request.url;
