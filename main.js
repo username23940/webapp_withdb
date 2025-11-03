@@ -39,7 +39,7 @@ var app = http.createServer(function(request,response){ // 요청이 들어오�
       author.home(request, response);
       }
     else if(pathname === '/create_author_process'){
-      author.create_author_process(request, response);
+      author.create_process(request, response);
       }
     else {
       response.writeHead(404);
