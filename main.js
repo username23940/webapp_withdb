@@ -38,13 +38,16 @@ var app = http.createServer(function(request,response){ // 요청이 들어오�
     else if(pathname === '/author'){
       author.home(request, response);
       }
-    else if(pathname === '/author/create_process'){
+    else if(pathname === '/author/create_process'){ // topic은 create 버튼을 눌러야 폼이 뜨지만, author는 author home 페이지에서 폼이 뜨므로 create 페이지 없음
       author.create_process(request, response);
+      } 
+    else if(pathname === '/author/update'){
+      author.update(request, response);
       }
-    else if(pathname === '/author/update_process'){
+    else if(pathname === '/author/update_process'){ // 프레임워크는 이런 부분(form 작성시 action으로 이동)을 라우팅이라고 하고 좀더 편리함(우리는 조건문 주르륵)
       author.update_process(request, response);
       }
-    else if(pathname === '/author/delete_process'){
+    else if(pathname === '/author/delete_process'){ 
       author.delete_process(request, response);
       }
     else {
