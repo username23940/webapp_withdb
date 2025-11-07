@@ -44,7 +44,7 @@ var app = http.createServer(function(request,response){ // 요청이 들어오�
     else if(pathname === '/author/update'){
       author.update(request, response);
       }
-    else if(pathname === '/author/update_process'){ // 프레임워크는 이런 부분(form 작성시 action으로 이동)을 라우팅이라고 하고 좀더 편리함(우리는 조건문 주르륵)
+    else if(pathname === '/author/update_process'){ // 프레임워크는 이런 부분(form 작성시 action으로 이동처럼 네트워크에서 경로 설정)을 라우팅이라고 하고 좀더 편리함(우리는 조건문 주르륵)
       author.update_process(request, response);
       }
     else if(pathname === '/author/delete_process'){ 
