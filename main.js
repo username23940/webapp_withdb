@@ -56,4 +56,6 @@ var app = http.createServer(function(request,response){ // 요청이 들어오�
     }
 });
                             
-app.listen(3000);
+app.listen(3000, '0.0.0.0', () => {
+  console.log('Server listening on port 3000');
+});
